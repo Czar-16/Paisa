@@ -8,7 +8,9 @@ export const signupSchema = z.object({
 
   lastName: z.string().trim().min(2, "Last name must be at least 2 characters"),
 
-  email: z.string().trim().email("Invalid email address"),
+  email: z.string().trim().email("Please enter a valid email"),
 
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
+
+export type SignupFormData = z.infer<typeof signupSchema>; // signupSchema se TypeScript type automatically generate karta hai
