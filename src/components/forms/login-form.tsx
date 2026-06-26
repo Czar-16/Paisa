@@ -3,69 +3,51 @@ import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { SignupFormData, signupSchema } from "@/lib/validations";
+import { LoginFormData, loginSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { signIn } from "next-auth/react";
 
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
-export default function SignupForm() {
+export default function LoginForm() {
   const router = useRouter();
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<SignupFormData>({
-    resolver: zodResolver(signupSchema),
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
   });
 
-  async function onSubmit(data: SignupFormData) {
+  async function onSubmit(data: LoginFormData) {
     try {
-      const response = await axios.post("/api/signup", data);
-      toast.success("signup successfully");
-      console.log("the response data is : ", response.data);
-      setTimeout(() => router.push("/login"), 1000);
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.message || "Signup failed");
-        console.error(error.response?.data);
+      const result = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
+
+      if (result?.ok) {
+        toast.success("✅ Login successfully!");
+        setTimeout(() => router.push("/dashboard"), 1000);
+      } else {
+        console.log("Login logic error:", result?.error);
+        toast.error(result?.error || "Invalid email or password");
       }
+    } catch (error) {
+      console.error("Network/Server error:", error);
+      toast.error("Something went wrong. Please check your connection.");
     }
   }
   return (
     <Card className="bg-black text-white border-zinc-800 w-full max-w-md">
       <CardHeader>
-        <CardTitle className="text-3xl text-center">Create Account</CardTitle>
+        <CardTitle className="text-3xl text-center">Login</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div>
-            <Label>First Name</Label>
-            <Input
-              {...register("firstName")}
-              placeholder="John"
-              className="mt-2 zinc-900 border-zinc-700"
-            ></Input>
-            {errors.firstName && (
-              <p className="mt-1 text-sm text-red-500">
-                {errors.firstName.message}
-              </p>
-            )}
-          </div>
-          <div>
-            <Label className="mt-2">Last Name</Label>
-            <Input
-              {...register("lastName")}
-              placeholder="Doe"
-              className="mt-2 zinc-900 border-zinc-700"
-            ></Input>
-            {errors.lastName && (
-              <p className="mt-1 text-sm text-red-500">
-                {errors.lastName.message}
-              </p>
-            )}
-          </div>
           <div>
             <Label className="mt-2">Email</Label>
             <Input
@@ -93,7 +75,7 @@ export default function SignupForm() {
               </p>
             )}
           </div>
-          <Button className="mt-2 w-full cursor-pointer">Create Account</Button>
+          <Button className="mt-2 w-full cursor-pointer">Login</Button>
         </form>
       </CardContent>
     </Card>

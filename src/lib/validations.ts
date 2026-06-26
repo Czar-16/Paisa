@@ -14,3 +14,11 @@ export const signupSchema = z.object({
 });
 
 export type SignupFormData = z.infer<typeof signupSchema>; // signupSchema se TypeScript type automatically generate karta hai
+
+export const loginSchema = z.object({
+  email: z.string().trim().email("Please enter a valid email"),
+
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+export type LoginFormData = z.infer<typeof loginSchema>;

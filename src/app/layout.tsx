@@ -3,6 +3,9 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "react-hot-toast";
+import Providers from "./Providers";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -50,7 +53,7 @@ export default function RootLayout({
             },
           }}
         />
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

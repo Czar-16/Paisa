@@ -27,7 +27,7 @@ export const authOptions: NextAuthOptions = {
           });
 
           if (!user) {
-            throw new Error("No user found");
+            throw new Error("Invalid credentials");
           }
 
           const isPasswordCorrect = await bcrypt.compare(
@@ -42,6 +42,7 @@ export const authOptions: NextAuthOptions = {
             id: user._id.toString(),
             email: user.email,
             name: `${user.firstName} ${user.lastName}`,
+            balance: user.balance,
           };
         } catch (error) {
           throw error;
